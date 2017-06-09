@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+    <title>Demo-后台管理中心</title>
+    <link rel="stylesheet" href="./layui/css/layui.css">
+    <link rel="stylesheet" href="./css/global.css">
+    <script type="text/javascript" src="./layui/layui.js"></script>
+</head>
+<body>
+<div class="layui-tab layui-tab-brief main-tab-container">
+    <ul class="layui-tab-title main-tab-title">
+      <a href="api_list.html"><li class="layui-this">图片接口列表</li></a>
+      <!--<a href="category_add.html"><li>栏目列表</li></a>-->
+      <div class="main-tab-item">接口列表</div>
+    </ul>
+    
+    <div class="layui-tab-content">
+        <ul>请求地址:<a href="#">imageList.php</ul>
+      <div class="layui-tab-item layui-show">
+      <form class="layui-form">
+            <table class="list-table">
+              <thead>
+                <tr>
+                  <th>参数</th>
+                  <th>类型</th>
+                  <th>是否必填</th>
+                  <th>默认值</th>
+                  <th>描述</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>page</td>
+                  <td>int</td>
+                  <td>否</td>
+                  <td>1</td>
+                  <td>分页数</td>
+                </tr>
+                
+                 <tr>
+                    
+                  <td>num</td>
+                  <td>int</td>
+                  <td>否</td>
+                  <td>10</td>
+                  <td>分页大小</td> 
+                </tr>               
+              </tbody>
+<!--              <thead>
+                <tr>
+                  <th colspan="5"><button class="layui-btn layui-btn-small" lay-submit="" lay-filter="sort">排序</button></th>
+                </tr>
+              </thead>-->
+            </table>
+
+      </form>
+      </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+layui.use(['element', 'layer', 'form'], function(){
+  var element = layui.element()
+  ,jq = layui.jquery
+  ,form = layui.form()
+  ,laypage = layui.laypage;
+
+  //图片预览
+  jq('.list-table td .thumb').hover(function(){
+    jq(this).append('<img class="thumb-show" src="'+jq(this).attr('thumb')+'" >');
+  },function(){
+    jq(this).find('img').remove();
+  });
+  //链接预览
+  jq('.list-table td .link').hover(function(){
+    var link = jq(this).attr('href');
+    layer.tips( link, this, {
+    tips: [2, '#009688'],
+    time: false
+  });
+  },function(){
+    layer.closeAll('tips');
+  });
+
+  //监听提交
+  form.on('submit(sort)', function(data){
+    loading = layer.load(2, {
+      shade: [0.2,'#000'] //0.2透明度的白色背景
+    });
+    var param = data.field;
+    jq.post('',param,function(data){
+      if(data.code == 200){
+        layer.close(loading);
+        layer.msg(data.msg, {icon: 1, time: 1000}, function(){
+          location.reload();//do something
+        });
+      }else{
+        layer.close(loading);
+        layer.msg(data.msg, {icon: 2, anim: 6, time: 1000});
+      }
+    });
+    return false;
+  });
+
+  //ajax删除
+  jq('.del_btn').click(function(){
+    var name = jq(this).attr('category-name');
+    var id = jq(this).attr('category-id');
+    layer.confirm('确定删除【'+name+'】?', function(index){
+      loading = layer.load(2, {
+        shade: [0.2,'#000'] //0.2透明度的白色背景
+      });
+      jq.post('',{'id':id},function(data){
+        if(data.code == 200){
+          layer.close(loading);
+          layer.msg(data.msg, {icon: 1, time: 1000}, function(){
+            location.reload();//do something
+          });
+        }else{
+          layer.close(loading);
+          layer.msg(data.msg, {icon: 2, anim: 6, time: 1000});
+        }
+      });
+    });
+    
+  });
+  
+})
+</script>
+</body>
+</html>
